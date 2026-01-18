@@ -1,10 +1,85 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
-  <title>Emergency Info</title>
+  <meta charset="UTF-8">
+  <title>Emergency Information</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+  <style>
+    body { font-family: Arial, sans-serif; max-width: 480px; margin: auto; padding: 20px; }
+    input, button { width: 100%; padding: 12px; margin-top: 10px; }
+    button { background-color: #b30000; color: white; border: none; cursor: pointer; }
+    button:hover { background-color: #900000; }
+    .hidden { display: none; }
+    .card { background: #f9f9f9; padding: 15px; margin-top: 15px; border-radius: 6px; }
+  </style>
 </head>
 <body>
-  <h1>Emergency Info Page</h1>
-  <p>If you can see this, GitHub Pages is working.</p>
+
+<h1>Emergency Information</h1>
+<p>Authorised access only.</p>
+
+<input type="password" id="passphrase" placeholder="Enter passphrase">
+<button onclick="unlock()">Unlock</button>
+
+<p id="error" style="color:red;"></p>
+
+<div id="info" class="hidden card">
+  <p><strong>Name:</strong> <span id="name"></span></p>
+  <p><strong>Nationality:</strong> <span id="nationality"></span></p>
+  <p><strong>Allergies:</strong> <span id="allergies"></span></p>
+  <p><strong>Medical Conditions:</strong> <span id="medical"></span></p>
+  <p><strong>Medications:</strong> <span id="medications"></span></p>
+  <p><strong>Blood Type:</strong> <span id="blood"></span></p>
+  <p><strong>Emergency Contact:</strong> <span id="contact"></span></p>
+  <p><strong>Languages:</strong> <span id="languages"></span></p>
+</div>
+
+<script>
+const people = {
+  "TEST123": {
+    passphrase: "testphrase",
+    name: "Alex Smith",
+    nationality: "UK",
+    allergies: "Peanuts",
+    medical: "Asthma",
+    medications: "Salbutamol inhaler",
+    blood: "O+",
+    contact: "+44 7000000000",
+    languages: "English, French"
+  }
+};
+
+const params = new URLSearchParams(window.location.search);
+const id = params.get("id");
+
+function unlock() {
+  const input = document.getElementById("passphrase").value;
+  const error = document.getElementById("error");
+
+  if (!people[id]) {
+    error.textContent = "Invalid emergency tag.";
+    return;
+  }
+
+  if (input === people[id].passphrase) {
+    document.getElementById("info").classList.remove("hidden");
+
+    document.getElementById("name").textContent = people[id].name;
+    document.getElementById("nationality").textContent = people[id].nationality;
+    document.getElementById("allergies").textContent = people[id].allergies;
+    document.getElementById("medical").textContent = people[id].medical;
+    document.getElementById("medications").textContent = people[id].medications;
+    document.getElementById("blood").textContent = people[id].blood;
+    document.getElementById("contact").textContent = people[id].contact;
+    document.getElementById("languages").textContent = people[id].languages;
+
+    error.textContent = "";
+  } else {
+    error.textContent = "Incorrect passphrase.";
+  }
+}
+</script>
+
 </body>
 </html>

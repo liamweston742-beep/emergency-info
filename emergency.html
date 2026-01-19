@@ -37,7 +37,7 @@
 
 <script>
 const people = {
-  "Test123": {
+  "test123": {
     passphrase: "testphrase",
     name: "Alex Smith",
     nationality: "UK",
@@ -47,11 +47,23 @@ const people = {
     blood: "O+",
     contact: "+44 7000000000",
     languages: "English, French"
+  },
+  "b2g5m8": {
+    passphrase: "bluealpaca",
+    name: "Jamie Brown",
+    nationality: "UK",
+    allergies: "None",
+    medical: "Diabetes",
+    medications: "Insulin",
+    blood: "A-",
+    contact: "+44 7000000001",
+    languages: "English"
   }
 };
 
+// Make ID case-insensitive
 const params = new URLSearchParams(window.location.search);
-const id = params.get("id");
+const id = params.get("id")?.toLowerCase();
 
 function unlock() {
   const input = document.getElementById("passphrase").value;

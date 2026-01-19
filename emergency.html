@@ -1,149 +1,108 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <title>Emergency Information</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta charset="UTF-8">
+<title>Emergency Information</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-  <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&display=swap" rel="stylesheet">
+<!-- Google Fonts -->
+<link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&display=swap" rel="stylesheet">
 
-  <style>
-    .hidden { display: none; }
+<style>
+  body {
+    font-family: 'Roboto', Arial, sans-serif;
+    margin: 0;
+    padding: 0;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    background: linear-gradient(135deg, #e0e5ec, #f5f7fa);
+    min-height: 100vh;
+  }
 
-    body {
-      font-family: 'Roboto', Arial, sans-serif;
-      margin: 0;
-      padding: 0;
-      display: flex;
-      justify-content: center;
-      background: linear-gradient(135deg, #e0e5ec, #f5f7fa);
-      min-height: 100vh;
-    }
+  .container {
+    background: #fff;
+    width: 95%;
+    max-width: 480px;
+    padding: 30px;
+    border-radius: 16px;
+    box-shadow: 0 10px 25px rgba(0,0,0,0.1);
+    border: 1px solid #d1d5db;
+  }
 
-    .container {
-      background: #ffffff;
-      max-width: 480px;
-      width: 95%;
-      padding: 30px;
-      border-radius: 16px;
-      box-shadow: 0 10px 25px rgba(0,0,0,0.1);
-      border: 1px solid #d1d5db;
-    }
+  h1 { text-align: center; color: #b30000; margin-bottom: 5px; }
+  .subtitle { text-align: center; color: #555; font-size: 0.9em; margin-bottom: 20px; }
 
-    h1 {
-      text-align: center;
-      color: #b30000;
-      margin-bottom: 5px;
-    }
+  .input-wrapper {
+    position: relative;
+    width: 100%;
+    margin-top: 10px;
+  }
 
-    .subtitle {
-      text-align: center;
-      color: #555;
-      font-size: 0.9em;
-      margin-bottom: 20px;
-    }
+  .input-wrapper input {
+    width: 100%;
+    padding: 14px;
+    padding-right: 50px;
+    font-size: 1em;
+    border-radius: 8px;
+    border: 1px solid #b0b5bf;
+    box-sizing: border-box;
+    transition: border-color 0.3s, box-shadow 0.3s;
+  }
 
-    input, button {
-      width: 100%;
-      padding: 14px;
-      margin-top: 10px;
-      font-size: 1em;
-      border-radius: 8px;
-      border: 1px solid #b0b5bf;
-      box-sizing: border-box;
-    }
+  .input-wrapper input:focus {
+    outline: none;
+    border-color: #0052cc;
+    box-shadow: 0 0 5px rgba(0,82,204,0.3);
+  }
 
-    input:focus {
-      outline: none;
-      border-color: #0052cc;
-      box-shadow: 0 0 5px rgba(0,82,204,0.3);
-    }
+  .input-wrapper .show-hide {
+    position: absolute;
+    right: 10px;
+    top: 50%;
+    transform: translateY(-50%);
+    border: none;
+    background: none;
+    cursor: pointer;
+    font-size: 1.1em;
+    color: #555;
+  }
 
-    button {
-      background-color: #0052cc;
-      color: white;
-      border: none;
-      font-weight: 600;
-      cursor: pointer;
-      transition: all 0.3s ease;
-      box-shadow: 0 4px 8px rgba(0,0,0,0.1);
-    }
+  .input-wrapper .show-hide:hover { color: #000; }
 
-    button:hover {
-      background-color: #003d99;
-    }
+  #unlockBtn {
+    background-color: #b30000;
+    color: white;
+    margin-top: 15px;
+    font-weight: 600;
+    border-radius: 8px;
+    border: none;
+    padding: 14px;
+    font-size: 1.05em;
+    cursor: pointer;
+    box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+    transition: all 0.3s ease;
+  }
 
-    #error {
-      color: #d93025;
-      margin-top: 10px;
-      font-weight: bold;
-      text-align: center;
-    }
+  #unlockBtn:hover {
+    background-color: #900000;
+    box-shadow: 0 6px 12px rgba(0,0,0,0.15);
+  }
 
-    .card {
-      background: #f9f9f9;
-      padding: 20px;
-      margin-top: 20px;
-      border-radius: 10px;
-      box-shadow: 0 2px 8px rgba(0,0,0,0.05);
-    }
+  #error { color: #d93025; margin-top: 10px; font-weight: bold; text-align: center; }
 
-    .card p {
-      margin: 8px 0;
-    }
+  .card {
+    background: #f9f9f9;
+    padding: 20px;
+    margin-top: 20px;
+    border-radius: 10px;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+  }
 
-    .card strong {
-      display: inline-block;
-      width: 140px;
-    }
-    .input-wrapper {
-  position: relative;
-  width: 100%;
-  margin-top: 10px;
-}
-
-.input-wrapper input {
-  width: 100%;
-  padding-right: 50px; /* space for the eye button */
-}
-
-.input-wrapper .show-hide {
-  position: absolute;
-  right: 10px;
-  top: 50%;
-  transform: translateY(-50%);
-  border: none;
-  background: none;
-  cursor: pointer;
-  font-size: 1.1em;
-  color: #555;
-}
-
-.input-wrapper .show-hide:hover {
-  color: #000;
-}
-
-/* Make Unlock button red for emergency */
-#unlockBtn {
-  background-color: #b30000; /* emergency red */
-  color: white;
-  margin-top: 15px;
-  font-weight: 600;
-  border-radius: 8px;
-  border: none;
-  padding: 14px;
-  font-size: 1.05em;
-  cursor: pointer;
-  box-shadow: 0 4px 8px rgba(0,0,0,0.1);
-  transition: all 0.3s ease;
-}
-
-#unlockBtn:hover {
-  background-color: #900000;
-  box-shadow: 0 6px 12px rgba(0,0,0,0.15);
-}
-
-  </style>
+  .card p { margin: 8px 0; line-height: 1.4; }
+  .card strong { display: inline-block; width: 140px; }
+  .hidden { display: none; }
+</style>
 </head>
 
 <body>
@@ -151,15 +110,12 @@
     <h1>Emergency Information</h1>
     <p class="subtitle">Authorised access only</p>
 
- <div class="input-wrapper">
-  <input type="password" id="passphrase" placeholder="Enter passphrase">
-  <button type="button" class="show-hide" onclick="togglePassphrase()">👁</button>
-</div>
+    <div class="input-wrapper">
+      <input type="password" id="passphrase" placeholder="Enter passphrase">
+      <button type="button" class="show-hide" onclick="togglePassphrase()">👁</button>
+    </div>
 
-<button id="unlockBtn" onclick="unlock()">Unlock</button>
-
-
-
+    <button id="unlockBtn" onclick="unlock()">Unlock</button>
     <p id="error"></p>
 
     <div id="info" class="hidden card">
@@ -176,24 +132,13 @@
 
 <script>
 const MAX_ATTEMPTS = 4;
-const LOCK_TIME_MS = 10 * 60 * 1000; // 10 minutes
+const LOCK_TIME_MS = 10*60*1000;
 
 let attempts = 0;
 let lockedUntil = null;
 
 const people = {
-  "test123": {
-    passphrase: "testphrase",
-    name: "Alex Smith",
-    nationality: "UK",
-    allergies: "Peanuts",
-    medical: "Asthma",
-    medications: "Salbutamol inhaler",
-    blood: "O+",
-    contact: "+44 7000000000",
-    languages: "English, French"
-  },
-
+  "test123": { passphrase: "testphrase", name: "Alex Smith", nationality: "UK", allergies: "Peanuts", medical: "Asthma", medications: "Salbutamol inhaler", blood: "O+", contact: "+44 7000000000", languages: "English, French" },
   "a1b2c3d4": { passphrase: "", name: "", nationality: "", allergies: "", medical: "", medications: "", blood: "", contact: "", languages: "" },
   "e5f6g7h8": { passphrase: "", name: "", nationality: "", allergies: "", medical: "", medications: "", blood: "", contact: "", languages: "" },
   "i9j0k1l2": { passphrase: "", name: "", nationality: "", allergies: "", medical: "", medications: "", blood: "", contact: "", languages: "" },
@@ -208,7 +153,6 @@ const people = {
   "s5t6u7v8": { passphrase: "", name: "", nationality: "", allergies: "", medical: "", medications: "", blood: "", contact: "", languages: "" }
 };
 
-// Read ID from URL
 const params = new URLSearchParams(window.location.search);
 const id = params.get("id")?.toLowerCase();
 
@@ -238,19 +182,13 @@ function unlock() {
 
     document.getElementById("info").classList.remove("hidden");
 
-    document.getElementById("name").textContent = people[id].name;
-    document.getElementById("nationality").textContent = people[id].nationality;
-    document.getElementById("allergies").textContent = people[id].allergies;
-    document.getElementById("medical").textContent = people[id].medical;
-    document.getElementById("medications").textContent = people[id].medications;
-    document.getElementById("blood").textContent = people[id].blood;
-    document.getElementById("contact").textContent = people[id].contact;
-    document.getElementById("languages").textContent = people[id].languages;
+    for (const field of ["name","nationality","allergies","medical","medications","blood","contact","languages"]) {
+      document.getElementById(field).textContent = people[id][field];
+    }
 
     error.textContent = "";
   } else {
     attempts++;
-
     if (attempts >= MAX_ATTEMPTS) {
       lockedUntil = now + LOCK_TIME_MS;
       error.textContent = "Too many incorrect attempts. Access temporarily locked.";
@@ -260,16 +198,11 @@ function unlock() {
   }
 }
 
-// Auto-focus + Enter key support
 window.addEventListener("load", () => {
   const field = document.getElementById("passphrase");
   field.focus();
-
-  field.addEventListener("keydown", (e) => {
-    if (e.key === "Enter") unlock();
-  });
+  field.addEventListener("keydown", e => { if(e.key==="Enter") unlock(); });
 });
 </script>
-
 </body>
 </html>

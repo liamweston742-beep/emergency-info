@@ -5,34 +5,30 @@
   <title>Emergency Information</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-  <!-- Google Fonts for cleaner look -->
   <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&display=swap" rel="stylesheet">
 
   <style>
-    .hidden {
-  display: none;
-}
+    .hidden { display: none; }
 
-  body {
-  font-family: 'Roboto', Arial, sans-serif;
-  margin: 0;
-  padding: 0;
-  display: flex;
-  justify-content: center;
-  background: linear-gradient(135deg, #e0e5ec, #f5f7fa);
-  min-height: 100vh;
-}
+    body {
+      font-family: 'Roboto', Arial, sans-serif;
+      margin: 0;
+      padding: 0;
+      display: flex;
+      justify-content: center;
+      background: linear-gradient(135deg, #e0e5ec, #f5f7fa);
+      min-height: 100vh;
+    }
 
-/* Container with subtle depth */
-.container {
-  background: #ffffff;
-  max-width: 480px;
-  width: 95%;
-  padding: 30px;
-  border-radius: 16px;
-  box-shadow: 0 10px 25px rgba(0,0,0,0.1);
-  border: 1px solid #d1d5db;
-}
+    .container {
+      background: #ffffff;
+      max-width: 480px;
+      width: 95%;
+      padding: 30px;
+      border-radius: 16px;
+      box-shadow: 0 10px 25px rgba(0,0,0,0.1);
+      border: 1px solid #d1d5db;
+    }
 
     h1 {
       text-align: center;
@@ -40,7 +36,7 @@
       margin-bottom: 5px;
     }
 
-    p.subtitle {
+    .subtitle {
       text-align: center;
       color: #555;
       font-size: 0.9em;
@@ -52,28 +48,30 @@
       padding: 14px;
       margin-top: 10px;
       font-size: 1em;
-      border-radius: 6px;
-      border: 1px solid #ccc;
+      border-radius: 8px;
+      border: 1px solid #b0b5bf;
       box-sizing: border-box;
     }
 
-    button {
-  background-color: #0052cc; /* deep blue = trust */
-  color: white;
-  border: none;
-  border-radius: 8px;
-  padding: 14px;
-  font-size: 1.05em;
-  font-weight: 600;
-  cursor: pointer;
-  transition: all 0.3s ease;
-  box-shadow: 0 4px 8px rgba(0,0,0,0.1);
-}
+    input:focus {
+      outline: none;
+      border-color: #0052cc;
+      box-shadow: 0 0 5px rgba(0,82,204,0.3);
+    }
 
-button:hover {
-  background-color: #003d99; /* slightly darker on hover */
-  box-shadow: 0 6px 12px rgba(0,0,0,0.15);
-}
+    button {
+      background-color: #0052cc;
+      color: white;
+      border: none;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+    }
+
+    button:hover {
+      background-color: #003d99;
+    }
 
     #error {
       color: #d93025;
@@ -92,274 +90,111 @@ button:hover {
 
     .card p {
       margin: 8px 0;
-      line-height: 1.4;
     }
 
-    .card p strong {
+    .card strong {
       display: inline-block;
       width: 140px;
-      color: #333;
     }
-    input {
-  width: 100%;
-  padding: 14px;
-  margin-top: 10px;
-  font-size: 1em;
-  border-radius: 8px;
-  border: 1px solid #b0b5bf;
-  box-sizing: border-box;
-  transition: border-color 0.3s, box-shadow 0.3s;
-}
-
-input:focus {
-  outline: none;
-  border-color: #0052cc;
-  box-shadow: 0 0 5px rgba(0,82,204,0.3);
-}
-
-    
   </style>
 </head>
-<body>
 
+<body>
   <div class="container">
     <h1>Emergency Information</h1>
     <p class="subtitle">Authorised access only</p>
 
     <input type="password" id="passphrase" placeholder="Enter passphrase">
+    <button type="button" onclick="togglePassphrase()">Show / Hide Passphrase</button>
     <button onclick="unlock()">Unlock</button>
+
     <p id="error"></p>
 
-<div id="info" class="hidden card">
-  <p><strong>Name:</strong> <span id="name"></span></p>
-  <p><strong>Nationality:</strong> <span id="nationality"></span></p>
-  <p><strong>Allergies:</strong> <span id="allergies"></span></p>
-  <p><strong>Medical Conditions:</strong> <span id="medical"></span></p>
-  <p><strong>Medications:</strong> <span id="medications"></span></p>
-  <p><strong>Blood Type:</strong> <span id="blood"></span></p>
-  <p><strong>Emergency Contact:</strong> <span id="contact"></span></p>
-  <p><strong>Languages:</strong> <span id="languages"></span></p>
-</div>
+    <div id="info" class="hidden card">
+      <p><strong>Name:</strong> <span id="name"></span></p>
+      <p><strong>Nationality:</strong> <span id="nationality"></span></p>
+      <p><strong>Allergies:</strong> <span id="allergies"></span></p>
+      <p><strong>Medical Conditions:</strong> <span id="medical"></span></p>
+      <p><strong>Medications:</strong> <span id="medications"></span></p>
+      <p><strong>Blood Type:</strong> <span id="blood"></span></p>
+      <p><strong>Emergency Contact:</strong> <span id="contact"></span></p>
+      <p><strong>Languages:</strong> <span id="languages"></span></p>
+    </div>
+  </div>
 
 <script>
   const MAX_ATTEMPTS = 4;
-const LOCK_TIME_MS = 10 * 60 * 1000; // 10 minutes
+  const LOCK_TIME_MS = 10 * 60 * 1000;
 
-let attempts = 0;
-let lockedUntil = null;
-  
-const people = {
-  "test123": {//
-    passphrase: "testphrase",
-    name: "Alex Smith",
-    nationality: "UK",
-    allergies: "Peanuts",
-    medical: "Asthma",
-    medications: "Salbutamol inhaler",
-    blood: "O+",
-    contact: "+44 7000000000",
-    languages: "English, French"
-  },
-  "a1b2c3d4": {//https://liamweston742-beep.github.io/Emergency-Info/emergency.html?id=a1b2c3d4
-    passphrase: "",
-    name: "",
-    nationality: "",
-    allergies: "",
-    medical: "",
-    medications: "",
-    blood: "",
-    contact: "",
-    languages: ""
-  },
-  "e5f6g7h8": {//https://liamweston742-beep.github.io/Emergency-Info/emergency.html?id=e5f6g7h8
-    passphrase: "",
-    name: "",
-    nationality: "",
-    allergies: "",
-    medical: "",
-    medications: "",
-    blood: "",
-    contact: "",
-    languages: ""
-  },
-  "i9j0k1l2": {//https://liamweston742-beep.github.io/Emergency-Info/emergency.html?id=i9j0k1l2
-    passphrase: "",
-    name: "",
-    nationality: "",
-    allergies: "",
-    medical: "",
-    medications: "",
-    blood: "",
-    contact: "",
-    languages: ""
-  },
-  "m3n4o5p6": {//https://liamweston742-beep.github.io/Emergency-Info/emergency.html?id=m3n4o5p6
-    passphrase: "",
-    name: "",
-    nationality: "",
-    allergies: "",
-    medical: "",
-    medications: "",
-    blood: "",
-    contact: "",
-    languages: ""
-  },
-  "q7r8s9t0": {//https://liamweston742-beep.github.io/Emergency-Info/emergency.html?id=q7r8s9t0
-    passphrase: "",
-    name: "",
-    nationality: "",
-    allergies: "",
-    medical: "",
-    medications: "",
-    blood: "",
-    contact: "",
-    languages: ""
-  },
-  "u1v2w3x4": {//https://liamweston742-beep.github.io/Emergency-Info/emergency.html?id=u1v2w3x4
-    passphrase: "",
-    name: "",
-    nationality: "",
-    allergies: "",
-    medical: "",
-    medications: "",
-    blood: "",
-    contact: "",
-    languages: ""
-  },
-  "y5z6a7b8": {//https://liamweston742-beep.github.io/Emergency-Info/emergency.html?id=y5z6a7b8
-    passphrase: "",
-    name: "",
-    nationality: "",
-    allergies: "",
-    medical: "",
-    medications: "",
-    blood: "",
-    contact: "",
-    languages: ""
-  },
-  "c9d0e1f2": {//https://liamweston742-beep.github.io/Emergency-Info/emergency.html?id=c9d0e1f2
-    passphrase: "",
-    name: "",
-    nationality: "",
-    allergies: "",
-    medical: "",
-    medications: "",
-    blood: "",
-    contact: "",
-    languages: ""
-  },
-  "g3h4i5j6": {//https://liamweston742-beep.github.io/Emergency-Info/emergency.html?id=g3h4i5j6
-    passphrase: "",
-    name: "",
-    nationality: "",
-    allergies: "",
-    medical: "",
-    medications: "",
-    blood: "",
-    contact: "",
-    languages: ""
-  },
-  "k7l8m9n0": {//https://liamweston742-beep.github.io/Emergency-Info/emergency.html?id=k7l8m9n0
-    passphrase: "",
-    name: "",
-    nationality: "",
-    allergies: "",
-    medical: "",
-    medications: "",
-    blood: "",
-    contact: "",
-    languages: ""
-  },
-  "o1p2q3r4": {//https://liamweston742-beep.github.io/Emergency-Info/emergency.html?id=o1p2q3r4
-    passphrase: "",
-    name: "",
-    nationality: "",
-    allergies: "",
-    medical: "",
-    medications: "",
-    blood: "",
-    contact: "",
-    languages: ""
-  },
-  "s5t6u7v8": {//https://liamweston742-beep.github.io/Emergency-Info/emergency.html?id=s5t6u7v8
-    passphrase: "",
-    name: "",
-    nationality: "",
-    allergies: "",
-    medical: "",
-    medications: "",
-    blood: "",
-    contact: "",
-    languages: ""
-  }
-  
-};
+  let attempts = 0;
+  let lockedUntil = null;
 
-// Make ID case-insensitive
-const params = new URLSearchParams(window.location.search);
-const id = params.get("id")?.toLowerCase();
+  const people = {
+    "test123": {
+      passphrase: "testphrase",
+      name: "Alex Smith",
+      nationality: "UK",
+      allergies: "Peanuts",
+      medical: "Asthma",
+      medications: "Salbutamol inhaler",
+      blood: "O+",
+      contact: "+44 7000000000",
+      languages: "English, French"
+    }
+  };
 
-function unlock() {
-  const input = document.getElementById("passphrase").value;
-  <button type="button" onclick="togglePassphrase()">Show / Hide Passphrase</button>
-function togglePassphrase() {
-  const input = document.getElementById("passphrase");
-  input.type = input.type === "password" ? "text" : "password";
-}
+  const params = new URLSearchParams(window.location.search);
+  const id = params.get("id")?.toLowerCase();
 
-  const error = document.getElementById("error");
-  const now = Date.now();
-
-  // Check if locked
-  if (lockedUntil && now < lockedUntil) {
-    error.textContent = "Too many incorrect attempts. Please try again later.";
-    return;
+  function togglePassphrase() {
+    const input = document.getElementById("passphrase");
+    input.type = input.type === "password" ? "text" : "password";
   }
 
-  if (!people[id]) {
-    error.textContent = "Invalid emergency tag.";
-    return;
-  }
+  function unlock() {
+    const input = document.getElementById("passphrase").value;
+    const error = document.getElementById("error");
+    const now = Date.now();
 
-  if (input === people[id].passphrase) {
-    // Reset attempts on success
-    attempts = 0;
-    lockedUntil = null;
+    if (lockedUntil && now < lockedUntil) {
+      error.textContent = "Too many incorrect attempts. Please try again later.";
+      return;
+    }
 
-    document.getElementById("info").classList.remove("hidden");
+    if (!people[id]) {
+      error.textContent = "Invalid emergency tag.";
+      return;
+    }
 
-    document.getElementById("name").textContent = people[id].name;
-    document.getElementById("nationality").textContent = people[id].nationality;
-    document.getElementById("allergies").textContent = people[id].allergies;
-    document.getElementById("medical").textContent = people[id].medical;
-    document.getElementById("medications").textContent = people[id].medications;
-    document.getElementById("blood").textContent = people[id].blood;
-    document.getElementById("contact").textContent = people[id].contact;
-    document.getElementById("languages").textContent = people[id].languages;
+    if (input === people[id].passphrase) {
+      attempts = 0;
+      lockedUntil = null;
 
-    error.textContent = "";
-  } else {
-    attempts++;
+      document.getElementById("info").classList.remove("hidden");
 
-    if (attempts >= MAX_ATTEMPTS) {
-      lockedUntil = now + LOCK_TIME_MS;
-      error.textContent = "Too many incorrect attempts. Access temporarily locked.";
+      for (const field of ["name","nationality","allergies","medical","medications","blood","contact","languages"]) {
+        document.getElementById(field).textContent = people[id][field];
+      }
+
+      error.textContent = "";
     } else {
-      error.textContent = `Incorrect passphrase. ${MAX_ATTEMPTS - attempts} attempt(s) remaining.`;
+      attempts++;
+      if (attempts >= MAX_ATTEMPTS) {
+        lockedUntil = now + LOCK_TIME_MS;
+        error.textContent = "Too many incorrect attempts. Access temporarily locked.";
+      } else {
+        error.textContent = `Incorrect passphrase. ${MAX_ATTEMPTS - attempts} attempt(s) remaining.`;
+      }
     }
   }
-}
-window.addEventListener("load", () => {
-  document.getElementById("passphrase").focus();
-});
-  document.getElementById("passphrase").addEventListener("keydown", function (e) {
-  if (e.key === "Enter") {
-    unlock();
-  }
-});
 
+  window.addEventListener("load", () => {
+    document.getElementById("passphrase").focus();
+  });
 
+  document.getElementById("passphrase").addEventListener("keydown", e => {
+    if (e.key === "Enter") unlock();
+  });
 </script>
-
 </body>
 </html>

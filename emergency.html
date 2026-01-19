@@ -96,6 +96,53 @@
       display: inline-block;
       width: 140px;
     }
+    .input-wrapper {
+  position: relative;
+  width: 100%;
+  margin-top: 10px;
+}
+
+.input-wrapper input {
+  width: 100%;
+  padding-right: 50px; /* space for the eye button */
+}
+
+.input-wrapper .show-hide {
+  position: absolute;
+  right: 10px;
+  top: 50%;
+  transform: translateY(-50%);
+  border: none;
+  background: none;
+  cursor: pointer;
+  font-size: 1.1em;
+  color: #555;
+}
+
+.input-wrapper .show-hide:hover {
+  color: #000;
+}
+
+/* Make Unlock button red for emergency */
+#unlockBtn {
+  background-color: #b30000; /* emergency red */
+  color: white;
+  margin-top: 15px;
+  font-weight: 600;
+  border-radius: 8px;
+  border: none;
+  padding: 14px;
+  font-size: 1.05em;
+  cursor: pointer;
+  box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+  transition: all 0.3s ease;
+}
+
+#unlockBtn:hover {
+  background-color: #900000;
+  box-shadow: 0 6px 12px rgba(0,0,0,0.15);
+}
+
   </style>
 </head>
 
@@ -104,9 +151,14 @@
     <h1>Emergency Information</h1>
     <p class="subtitle">Authorised access only</p>
 
-    <input type="password" id="passphrase" placeholder="Enter passphrase">
-    <button type="button" onclick="togglePassphrase()">Show / Hide Passphrase</button>
-    <button onclick="unlock()">Unlock</button>
+ <div class="input-wrapper">
+  <input type="password" id="passphrase" placeholder="Enter passphrase">
+  <button type="button" class="show-hide" onclick="togglePassphrase()">👁</button>
+</div>
+
+<button id="unlockBtn" onclick="unlock()">Unlock</button>
+
+
 
     <p id="error"></p>
 
@@ -123,78 +175,101 @@
   </div>
 
 <script>
-  const MAX_ATTEMPTS = 4;
-  const LOCK_TIME_MS = 10 * 60 * 1000;
+const MAX_ATTEMPTS = 4;
+const LOCK_TIME_MS = 10 * 60 * 1000; // 10 minutes
 
-  let attempts = 0;
-  let lockedUntil = null;
+let attempts = 0;
+let lockedUntil = null;
 
-  const people = {
-    "test123": {
-      passphrase: "testphrase",
-      name: "Alex Smith",
-      nationality: "UK",
-      allergies: "Peanuts",
-      medical: "Asthma",
-      medications: "Salbutamol inhaler",
-      blood: "O+",
-      contact: "+44 7000000000",
-      languages: "English, French"
-    }
-  };
+const people = {
+  "test123": {
+    passphrase: "testphrase",
+    name: "Alex Smith",
+    nationality: "UK",
+    allergies: "Peanuts",
+    medical: "Asthma",
+    medications: "Salbutamol inhaler",
+    blood: "O+",
+    contact: "+44 7000000000",
+    languages: "English, French"
+  },
 
-  const params = new URLSearchParams(window.location.search);
-  const id = params.get("id")?.toLowerCase();
+  "a1b2c3d4": { passphrase: "", name: "", nationality: "", allergies: "", medical: "", medications: "", blood: "", contact: "", languages: "" },
+  "e5f6g7h8": { passphrase: "", name: "", nationality: "", allergies: "", medical: "", medications: "", blood: "", contact: "", languages: "" },
+  "i9j0k1l2": { passphrase: "", name: "", nationality: "", allergies: "", medical: "", medications: "", blood: "", contact: "", languages: "" },
+  "m3n4o5p6": { passphrase: "", name: "", nationality: "", allergies: "", medical: "", medications: "", blood: "", contact: "", languages: "" },
+  "q7r8s9t0": { passphrase: "", name: "", nationality: "", allergies: "", medical: "", medications: "", blood: "", contact: "", languages: "" },
+  "u1v2w3x4": { passphrase: "", name: "", nationality: "", allergies: "", medical: "", medications: "", blood: "", contact: "", languages: "" },
+  "y5z6a7b8": { passphrase: "", name: "", nationality: "", allergies: "", medical: "", medications: "", blood: "", contact: "", languages: "" },
+  "c9d0e1f2": { passphrase: "", name: "", nationality: "", allergies: "", medical: "", medications: "", blood: "", contact: "", languages: "" },
+  "g3h4i5j6": { passphrase: "", name: "", nationality: "", allergies: "", medical: "", medications: "", blood: "", contact: "", languages: "" },
+  "k7l8m9n0": { passphrase: "", name: "", nationality: "", allergies: "", medical: "", medications: "", blood: "", contact: "", languages: "" },
+  "o1p2q3r4": { passphrase: "", name: "", nationality: "", allergies: "", medical: "", medications: "", blood: "", contact: "", languages: "" },
+  "s5t6u7v8": { passphrase: "", name: "", nationality: "", allergies: "", medical: "", medications: "", blood: "", contact: "", languages: "" }
+};
 
-  function togglePassphrase() {
-    const input = document.getElementById("passphrase");
-    input.type = input.type === "password" ? "text" : "password";
+// Read ID from URL
+const params = new URLSearchParams(window.location.search);
+const id = params.get("id")?.toLowerCase();
+
+function togglePassphrase() {
+  const input = document.getElementById("passphrase");
+  input.type = input.type === "password" ? "text" : "password";
+}
+
+function unlock() {
+  const input = document.getElementById("passphrase").value;
+  const error = document.getElementById("error");
+  const now = Date.now();
+
+  if (lockedUntil && now < lockedUntil) {
+    error.textContent = "Too many incorrect attempts. Please try again later.";
+    return;
   }
 
-  function unlock() {
-    const input = document.getElementById("passphrase").value;
-    const error = document.getElementById("error");
-    const now = Date.now();
+  if (!people[id]) {
+    error.textContent = "Invalid emergency tag.";
+    return;
+  }
 
-    if (lockedUntil && now < lockedUntil) {
-      error.textContent = "Too many incorrect attempts. Please try again later.";
-      return;
-    }
+  if (input === people[id].passphrase) {
+    attempts = 0;
+    lockedUntil = null;
 
-    if (!people[id]) {
-      error.textContent = "Invalid emergency tag.";
-      return;
-    }
+    document.getElementById("info").classList.remove("hidden");
 
-    if (input === people[id].passphrase) {
-      attempts = 0;
-      lockedUntil = null;
+    document.getElementById("name").textContent = people[id].name;
+    document.getElementById("nationality").textContent = people[id].nationality;
+    document.getElementById("allergies").textContent = people[id].allergies;
+    document.getElementById("medical").textContent = people[id].medical;
+    document.getElementById("medications").textContent = people[id].medications;
+    document.getElementById("blood").textContent = people[id].blood;
+    document.getElementById("contact").textContent = people[id].contact;
+    document.getElementById("languages").textContent = people[id].languages;
 
-      document.getElementById("info").classList.remove("hidden");
+    error.textContent = "";
+  } else {
+    attempts++;
 
-      for (const field of ["name","nationality","allergies","medical","medications","blood","contact","languages"]) {
-        document.getElementById(field).textContent = people[id][field];
-      }
-
-      error.textContent = "";
+    if (attempts >= MAX_ATTEMPTS) {
+      lockedUntil = now + LOCK_TIME_MS;
+      error.textContent = "Too many incorrect attempts. Access temporarily locked.";
     } else {
-      attempts++;
-      if (attempts >= MAX_ATTEMPTS) {
-        lockedUntil = now + LOCK_TIME_MS;
-        error.textContent = "Too many incorrect attempts. Access temporarily locked.";
-      } else {
-        error.textContent = `Incorrect passphrase. ${MAX_ATTEMPTS - attempts} attempt(s) remaining.`;
-      }
+      error.textContent = `Incorrect passphrase. ${MAX_ATTEMPTS - attempts} attempt(s) remaining.`;
     }
   }
+}
 
-  window.addEventListener("load", () => {
-    document.getElementById("passphrase").focus();
-  });
+// Auto-focus + Enter key support
+window.addEventListener("load", () => {
+  const field = document.getElementById("passphrase");
+  field.focus();
 
-  document.getElementById("passphrase").addEventListener("keydown", e => {
+  field.addEventListener("keydown", (e) => {
     if (e.key === "Enter") unlock();
   });
+});
 </script>
+
 </body>
 </html>

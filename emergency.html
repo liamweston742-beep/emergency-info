@@ -200,11 +200,13 @@ const encryptedArray = [
 
 ];
 
-// Convert array to object
+
+// Convert array to object correctly
 const people = {};
-encryptedArray.forEach(item => {
-  people[item.id.toLowerCase()] = { encrypted: item.encryptedData, iv: item.iv };
+encryptedArray[0].forEach(record => {
+  people[record.id.toLowerCase()] = { encrypted: record.encryptedData, iv: record.iv };
 });
+
 
 // Get ID from URL
 const params = new URLSearchParams(window.location.search);

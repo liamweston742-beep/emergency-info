@@ -133,7 +133,6 @@
     </div>
   </div>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/crypto-js/4.1.1/crypto-js.min.js"></script>
-
 <script>
 const MAX_ATTEMPTS = 4;
 const LOCK_TIME_MS = 10*60*1000;
@@ -141,11 +140,10 @@ const LOCK_TIME_MS = 10*60*1000;
 let attempts = 0;
 let lockedUntil = null;
 
-
-<script>
-// Paste your entire encrypted JSON array here
+// Corrected encrypted array (no extra nesting)
 const encryptedArray = [
-  [
+
+
   {
     "id": "a1b2c3d4",
     "encryptedData": "04c9504ecb61248db92b2f63bce2f196b6dc89b274d4db2271f4509e736aac80399d5df6ec7a1db55c004c5b49a20565596c8accef7d84b1dda34a968c1d4c8eb6b99be62e55fd1b55e166c70f77c11caf40728d4b73fa2164b3914c184b9b50be4f9a692b75652b7182b6b9360f2dd8606111eea7b8cb168043e8fe82670e9c0f3b2ced77cdf5d0d7f5c54976414a74219c817261cff160af3e07c3ef74689118f65b6c09d0649dd2e387710d1c1b7d196f2087af6cfa29ccf48d4dd5a65479406ceaf5697095cabdf6f97a0d7b71a26c9b4143a6108ef3203ad6ae74832c0de4b6944014a80241b2b2b1c5cda6925d2406b3c8657acfabb2a2bf6a0082e97ff5ca20d032316dda919eced1bd9e647e011a3718a82272a1c073a0098fa92cb5"
@@ -194,20 +192,23 @@ const encryptedArray = [
     "id": "s5t6u7v8",
     "encryptedData": "278e5cf5c6b92915538eaa98e2ae19e41992a72122a92595617157a6a1335690b1d5f48277ff7f1599769abf1e224903401a08bbf38cedc7b05e4a826911d11f23dfb763b3a0e0ee789130e631d2d6ae4a940dc9070f8bad9b41c6942912003e8038511b06c4a308a801bdc40847d4595101d8242a3218b6e541d8d58d7a0bc79fd1d869afac082796fef9fa13f5e4afdcfe4888dfbaf895df5927bd9fcf16f6aaa4745fa75405d07f2087dd8dbcf99e9ca0415a2e7d1dcc82b2ffa65969490fdc5af871d4361b5e725bd03618d647d93e30a09735ccf432dd2c0b97ea246a1c975f8714d4f81eb8e7b41a3b12a9a498539dc49bab2f63298c0ed63c888f0e670927a10b49f44777fe8d493883145c0083774c1b81a5ce4f7728b475c7347a38"
   }
-]
 
-  // ... all other people
+
+
+
+
+
+  
+  // ...add the rest here without extra brackets
 ];
 
-// Convert array to an object for easy lookup
+// Convert to an object for easy lookup
 const people = {};
 encryptedArray.forEach(item => {
   people[item.id.toLowerCase()] = { encrypted: item.encryptedData };
 });
 
-
-
-
+// Get ID from URL
 const params = new URLSearchParams(window.location.search);
 const id = params.get("id")?.toLowerCase();
 
@@ -219,6 +220,11 @@ function togglePassphrase() {
 function unlock() {
   const passphrase = document.getElementById("passphrase").value;
   const error = document.getElementById("error");
+
+  if (!passphrase) {
+    error.textContent = "Enter a passphrase.";
+    return;
+  }
 
   if (!id || !people[id]) {
     error.textContent = "Invalid emergency tag.";
@@ -234,7 +240,6 @@ function unlock() {
     const data = JSON.parse(decrypted);
 
     document.getElementById("info").classList.remove("hidden");
-
     document.getElementById("name").textContent = data.name;
     document.getElementById("nationality").textContent = data.nationality;
     document.getElementById("allergies").textContent = data.allergies;
@@ -251,14 +256,12 @@ function unlock() {
   }
 }
 
-
-
-
 window.addEventListener("load", () => {
   const field = document.getElementById("passphrase");
   field.focus();
   field.addEventListener("keydown", e => { if(e.key==="Enter") unlock(); });
 });
 </script>
+
 </body>
 </html>

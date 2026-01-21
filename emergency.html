@@ -134,6 +134,14 @@
   </div>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/crypto-js/4.1.1/crypto-js.min.js"></script>
 <script>
+  // From your key.json (example)
+const keyHex = "YOUR_32_BYTE_KEY_IN_HEX";
+const ivHex  = "YOUR_16_BYTE_IV_IN_HEX";
+
+// Convert to CryptoJS format
+const key = CryptoJS.enc.Hex.parse(keyHex);
+const iv  = CryptoJS.enc.Hex.parse(ivHex);
+
 const MAX_ATTEMPTS = 4;
 const LOCK_TIME_MS = 10*60*1000;
 
@@ -218,7 +226,7 @@ function togglePassphrase() {
 }
 
 function unlock() {
-  const passphrase = document.getElementById("passphrase").value;
+  const passphrase = document.getElementById("passphrase").value.trim();
   const error = document.getElementById("error");
 
   if (!passphrase) {
@@ -232,13 +240,22 @@ function unlock() {
   }
 
   try {
-    const bytes = CryptoJS.AES.decrypt(people[id].encrypted, passphrase);
-    const decrypted = bytes.toString(CryptoJS.enc.Utf8);
+    // Convert hex encrypted string to CryptoJS format
+    const encryptedHex = people[id].encryptedData;
+    const encryptedWords = CryptoJS.enc.Hex.parse(encryptedHex);
 
-    if (!decrypted) throw new Error("Wrong passphrase");
+    // Decrypt using key + IV
+    const decrypted = CryptoJS.AES.decrypt(
+      { ciphertext: encryptedWords },
+      key,
+      { iv: iv, mode: CryptoJS.mode.CBC, padding: CryptoJS.pad.Pkcs7 }
+    ).toString(CryptoJS.enc.Utf8);
+
+    if (!decrypted) throw new Error("Decryption failed");
 
     const data = JSON.parse(decrypted);
 
+    // Show data
     document.getElementById("info").classList.remove("hidden");
     document.getElementById("name").textContent = data.name;
     document.getElementById("nationality").textContent = data.nationality;
@@ -251,10 +268,12 @@ function unlock() {
     document.getElementById("languages").textContent = data.languages;
 
     error.textContent = "";
-  } catch {
-    error.textContent = "Incorrect passphrase.";
+  } catch (e) {
+    console.error(e);
+    error.textContent = "Incorrect passphrase or decryption error.";
   }
 }
+
 
 window.addEventListener("load", () => {
   const field = document.getElementById("passphrase");

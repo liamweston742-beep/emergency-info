@@ -132,6 +132,7 @@
       <p><strong>Languages:</strong> <span id="languages"></span></p>
     </div>
   </div>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/crypto-js/4.1.1/crypto-js.min.js"></script>
 
 <script>
 const MAX_ATTEMPTS = 4;
@@ -140,21 +141,24 @@ const LOCK_TIME_MS = 10*60*1000;
 let attempts = 0;
 let lockedUntil = null;
 
+
 const people = {
-  "test123": { passphrase: "testphrase", name: "Alex Smith", nationality: "UK", allergies: "Peanuts", medical: "Asthma", medications: "Salbutamol inhaler", blood: "O+", contact: "+44 7000000000", contact2: "nmnbvcv", languages: "English, French" },
-  "a1b2c3d4": { passphrase: "", name: "", nationality: "", allergies: "", medical: "", medications: "", blood: "", contact: "", contact2: "", languages: "" },
-  "e5f6g7h8": { passphrase: "", name: "", nationality: "", allergies: "", medical: "", medications: "", blood: "", contact: "", contact2: "", languages: "" },
-  "i9j0k1l2": { passphrase: "", name: "", nationality: "", allergies: "", medical: "", medications: "", blood: "", contact: "", contact2: "", languages: "" },
-  "m3n4o5p6": { passphrase: "", name: "", nationality: "", allergies: "", medical: "", medications: "", blood: "", contact: "", contact2: "", languages: "" },
-  "q7r8s9t0": { passphrase: "", name: "", nationality: "", allergies: "", medical: "", medications: "", blood: "", contact: "", contact2: "", languages: "" },
-  "u1v2w3x4": { passphrase: "", name: "", nationality: "", allergies: "", medical: "", medications: "", blood: "", contact: "", contact2: "", languages: "" },
-  "y5z6a7b8": { passphrase: "", name: "", nationality: "", allergies: "", medical: "", medications: "", blood: "", contact: "", contact2: "", languages: "" },
-  "c9d0e1f2": { passphrase: "", name: "", nationality: "", allergies: "", medical: "", medications: "", blood: "", contact: "", contact2: "", languages: "" },
-  "g3h4i5j6": { passphrase: "", name: "", nationality: "", allergies: "", medical: "", medications: "", blood: "", contact: "", contact2: "", languages: "" },
-  "k7l8m9n0": { passphrase: "", name: "", nationality: "", allergies: "", medical: "", medications: "", blood: "", contact: "", contact2: "", languages: "" },
-  "o1p2q3r4": { passphrase: "", name: "", nationality: "", allergies: "", medical: "", medications: "", blood: "", contact: "", contact2: "", languages: "" },
-  "s5t6u7v8": { passphrase: "", name: "", nationality: "", allergies: "", medical: "", medications: "", blood: "", contact: "", contact2: "", languages: "" }
+  "test123": { encrypted: "" },
+  "a1b2c3d4": { encrypted: "" },
+  "e5f6g7h8": { encrypted: "" },
+  "i9j0k1l2": { encrypted: "" },
+  "m3n4o5p6": { encrypted: "" },
+  "q7r8s9t0": { encrypted: "" },
+  "u1v2w3x4": { encrypted: "" },
+  "y5z6a7b8": { encrypted: "" },
+  "c9d0e1f2": { encrypted: "" },
+  "g3h4i5j6": { encrypted: "" },
+  "k7l8m9n0": { encrypted: "" },
+  "o1p2q3r4": { encrypted: "" },
+  "s5t6u7v8": { encrypted: "" }
+  
 };
+
 
 const params = new URLSearchParams(window.location.search);
 const id = params.get("id")?.toLowerCase();
@@ -165,53 +169,40 @@ function togglePassphrase() {
 }
 
 function unlock() {
-  const input = document.getElementById("passphrase").value;
+  const passphrase = document.getElementById("passphrase").value;
   const error = document.getElementById("error");
-  const now = Date.now();
 
-  // Check if locked
-  if (lockedUntil && now < lockedUntil) {
-    error.textContent = "Too many incorrect attempts. Please try again later.";
-    return;
-  }
-
-  // Check valid ID
-  if (!people[id]) {
+  if (!id || !people[id]) {
     error.textContent = "Invalid emergency tag.";
     return;
   }
 
-  // Correct passphrase
-  if (input === people[id].passphrase) {
-    // Reset attempts
-    attempts = 0;
-    lockedUntil = null;
+  try {
+    const bytes = CryptoJS.AES.decrypt(people[id].encrypted, passphrase);
+    const decrypted = bytes.toString(CryptoJS.enc.Utf8);
+
+    if (!decrypted) throw new Error("Wrong passphrase");
+
+    const data = JSON.parse(decrypted);
 
     document.getElementById("info").classList.remove("hidden");
 
-    // Fill in all fields including the second contact
-    document.getElementById("name").textContent = people[id].name;
-    document.getElementById("nationality").textContent = people[id].nationality;
-    document.getElementById("allergies").textContent = people[id].allergies;
-    document.getElementById("medical").textContent = people[id].medical;
-    document.getElementById("medications").textContent = people[id].medications;
-    document.getElementById("blood").textContent = people[id].blood;
-    document.getElementById("contact").textContent = people[id].contact;       // Primary contact
-    document.getElementById("contact2").textContent = people[id].contact2;     // Secondary contact
-    document.getElementById("languages").textContent = people[id].languages;
+    document.getElementById("name").textContent = data.name;
+    document.getElementById("nationality").textContent = data.nationality;
+    document.getElementById("allergies").textContent = data.allergies;
+    document.getElementById("medical").textContent = data.medical;
+    document.getElementById("medications").textContent = data.medications;
+    document.getElementById("blood").textContent = data.blood;
+    document.getElementById("contact").textContent = data.contact;
+    document.getElementById("contact2").textContent = data.contact2;
+    document.getElementById("languages").textContent = data.languages;
 
     error.textContent = "";
-  } else {
-    // Incorrect passphrase
-    attempts++;
-    if (attempts >= MAX_ATTEMPTS) {
-      lockedUntil = now + LOCK_TIME_MS;
-      error.textContent = "Too many incorrect attempts. Access temporarily locked.";
-    } else {
-      error.textContent = `Incorrect passphrase. ${MAX_ATTEMPTS - attempts} attempt(s) remaining.`;
-    }
+  } catch {
+    error.textContent = "Incorrect passphrase.";
   }
 }
+
 
 
 window.addEventListener("load", () => {
